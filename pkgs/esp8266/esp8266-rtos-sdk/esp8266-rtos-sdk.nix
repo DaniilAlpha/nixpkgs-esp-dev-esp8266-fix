@@ -1,13 +1,11 @@
 {
-  rev ? "v3.4",
-  sha256 ? "sha256-WhGVo4NDOkOlu9tsLFhOcZYthmVfxquOibZ+nGetbuo=",
+  rev ? "c965e03d2b7418b085c394dc98c6a0d3371c2abd",
+  sha256 ? "sha256-84vTz0xMUPp2bhedcJTiwAGlP8mIwt8R9XE6bf0tCC4=",
   extraPythonPackages ? (pythonPackages: [ ]),
   stdenv,
-  lib,
   fetchFromGitHub,
 
   python3,
-  fetchPypi,
 
   # Tools for using ESP8266_RTOS_SDK.
   git,
@@ -24,9 +22,7 @@
 
   gcc-xtensa-lx106-elf-bin,
   esptool,
-}:
-
-let
+} : let
   customPython = (
     python3.withPackages (
       pythonPackages:
@@ -38,17 +34,9 @@ let
         click
         pyserial
         future
-        cryptography
+	cryptography
 
-        (pyparsing.overrideAttrs (oldAttrs: {
-          src = fetchPypi {
-            pname = "pyparsing";
-            version = "2.3.1";
-            sha256 = "sha256-ZskmiGJkGrysSpa6dFBuWUyITj9XaQppbSGtghDtZno=";
-          };
-
-          buildInputs = [ setuptools ];
-        }))
+	pyparsing
 
         pyelftools
       ]
@@ -102,6 +90,10 @@ stdenv.mkDerivation rec {
   dontUseNinjaInstall = true;
   dontUseNinjaCheck = true;
 
+  #preBuild = ''
+  #  export PYTHONPATH="$PYTHONPATH":"${pyparsing-2-3-1}/${python3.sitePackages}"
+  #'';
+
   installPhase = ''
     mkdir -p $out
     cp -rv . $out/
@@ -113,5 +105,5 @@ stdenv.mkDerivation rec {
     ln -s ${customPython}/lib $out/lib
   '';
 
-  meta.broken = true;
+  meta.broken = false;
 }

@@ -47,6 +47,22 @@ in deprecatedAlias // {
   esp8266-rtos-sdk = prev.callPackage ./pkgs/esp8266/esp8266-rtos-sdk/esp8266-rtos-sdk.nix { };
   esp8266-nonos-sdk = prev.callPackage ./pkgs/esp8266/esp8266-nonos-sdk/esp8266-nonos-sdk.nix { };
 
+  esp8266-python3 = prev.python3.override {
+	packageOverrides = pyFinal: pyPrev: {
+		pyparsing = pyPrev.pyparsing.overrideAttrs (oldAttrs: rec {
+			pname = "pyparsing";
+			version = "2.3.1";
+			src = pkgs.pythonPackages.fetchPypi {
+				inherit pname version;
+				sha256 = "sha256-ZskmiGJkGrysSpa6dFBuWUyITj9XaQppbSGtghDtZno=";
+			};
+			doCheck = false;
+
+			#buildInputs = (oldAttrs.buildInputs or []) ++ [ self.setuptools ];
+		});
+	};
+  };
+
   # QEMU
   qemu-esp32 = prev.callPackage ./pkgs/qemu-esp32 { };
 }
