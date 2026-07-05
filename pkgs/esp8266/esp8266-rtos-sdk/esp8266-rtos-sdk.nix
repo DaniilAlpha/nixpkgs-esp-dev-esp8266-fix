@@ -105,5 +105,10 @@ stdenv.mkDerivation rec {
     ln -s ${customPython}/lib $out/lib
   '';
 
+  postPatch = ''
+    substituteInPlace tools/kconfig/lxdialog/check-lxdialog.sh  \
+      --replace 'main() {}' 'int main() { return 0; }'          \
+  '';
+
   meta.broken = false;
 }
